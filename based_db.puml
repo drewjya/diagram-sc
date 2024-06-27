@@ -1,0 +1,224 @@
+@startuml
+skinparam linetype polyline
+skinparam linetype ortho
+skinparam class {
+BackgroundColor #78D0F6
+ArrowColor Black
+BorderColor Black
+}
+hide circle
+
+class User{
+    +id: int
+    +name: String
+    +email: String
+    +password: String
+    +profilePictureId: int
+    + login(email: string, password: string)
+    + register(email: string, password: string, name)
+    + refreshToken(userId: number)
+    + changePassword(userId: number, oldPassword: string, newPassword: string)
+    + editProfile(userId: number, name: string, email: string)
+    + logout(userId: number)
+    + deleteAccount(userId: number)
+}
+
+
+class ProjectMember{
+    +id: int 
+    +projectId: int 
+    +userId: int 
+    +role: int 
+    + addMember(projectId: number, userId: number, role: number)
+    + removeMember(projectId: number, userId: number)
+    + getProjectMembers(projectId: number)
+}
+
+class Project{
+    + id: int 
+    + name: String 
+    + startDate: Date 
+    + endDate: Date 
+    + ownerId: int 
+    + projectPictureId: int 
+    + createProject(name: string, description: string, ownerId: number, visibility: number)
+    + editProject(projectId: number, name: string, description: string, visibility: number)
+    + getProject(projectId: number)
+    + getProjects(userId: number)
+}
+
+
+class SubProject {
+    +id: int
+    +projectId: int
+    +name: String
+    +startDate: Date
+    +endDate: Date
+    +ownerId: int
+    + createSubProject(projectId: number, name: string, description: string, ownerId: number, visibility: number)
+    + editSubProject(subProjectId: number, name: string, startDate: Date, endDate: Date)
+    + getSubProject(subProjectId: number)
+    + getSubProjects(projectId: number)
+}
+
+class SubProjectMember{
+    +id: int 
+    +subProjectId: int 
+    +userId: int 
+    +projectMemberId: int 
+    + promoteToConsultant(subProjectId: number, userId: number)
+    + demoteToViewer(subProjectId: number, userId: number)
+    
+}
+
+
+class ProjectLog{
+    +id: int
+    +projectId: int
+    +title: String
+    +description: String
+    +createdAt: Timestamp
+    + createLog(projectId: number, title: string, description: string)
+    + getLogs(projectId: number)
+}
+
+
+class SubProjectLog{
+    +id: int
+    +subprojectId: int
+    +title: String
+    +description: String
+    +createdAt: Timestamp
+    + createLog(subprojectId: number, title: string, description: string)
+    + getLogs(subprojectId: number)
+}
+
+
+class Finding{
+    +id: int
+    +subProjectId: int
+    +userId: int
+    +title: String
+    +category: String
+    +location: String
+    +method: String
+    +environment: String
+    +application: String
+    +impact: String
+    +likelihood: String
+    +deletedAt: Timestamp
+    + createFinding(subProjectId: number, userId: number)
+    + editFindingHeader(findingId: number, title: string)
+    + editFindingProperties(findingId: number, category: string, location: string, method: string, environment: string, application: string, impact: string, likelihood: string)
+    + requestFindingDelete(findingId: number, userId: number)
+    + approveDeleteFinding(findingId: number, userId: number)
+    + rejectDeleteFinding(findingId: number, userId: number)
+    + getFindingDetail(findingId: number)
+    + getFindings(subProjectId: number)
+}
+
+
+class File{
+    +id: int
+    +name: String
+    +imagePath: String
+    +originalName: String
+    +contentType: String
+    + createFile(name: string, imagePath: string, originalName: string, contentType: string)
+    + deleteFile(fileId: number)
+}
+
+class FindingFile{
+    +id: int
+    +findingId: int
+    +fileId: int
+    + createFindingFile(findingId: number, data: File)
+}
+
+class ProjectFile{
+    +id: int
+    +projectId: int
+    +fileId: int
+    +type: String
+    + createProjectFile(projectId: number, data: File)
+}
+
+class SubProjectFile{
+    +id: int
+    +subprojectId: int
+    +fileId: int
+    +type: String
+    + createSubProjectFile(subprojectId: number, data: File)
+}
+
+class RetestHistory{
+    +id: int
+    +findingId: int
+    +testerId: int
+    +status: String
+    +comment: String
+    +version: String
+    +deletedAt: Timestamp
+    + createRetestHistory(findingId: number, testerId: number, status: string, comment: string, version: string)
+    + getRetestHistories(findingId: number)
+    + getRetestHistoryDetail(retestHistoryId: number)
+}
+
+class CVSSDetail{
+    +id : int
+    +findingId: int
+    +data: json
+    + createCVSSDetail(findingId: number, data: json)
+    + editCVSSDetail(cvssDetailId: number, data: json)
+    + getCVSSDetail(findingId: number)
+}
+
+
+class Document{
+    +id: String
+    +data: Bytea
+    + createDocument(id: string, data: Bytea)
+    + getDocument(id: string)
+    + editDocument(id: string, data: Bytea)
+}
+
+class VersionList{
+    +id: int
+    +findingId: int
+    +basedOn: Timestamp
+    +createdAt: Timestamp
+    +type: String
+    +userId: int
+    + createVersionList(findingId: number, version: string)
+    + getVersions(findingId: number)
+
+}
+
+class ChatRoom{
+    +id: int
+    +findingId: int
+    +userId: int
+    +title: String
+    + createDiscussion(findingId: number, userId: number, title: string)
+    + getDiscussions(findingId: number)
+    + getDiscussionDetail(discussionId: number)
+}
+
+class Chat{
+    +id: int
+    +chatRoomId: int
+    +userId: int
+    +content: String
+    +replyChatId: int
+    +createdAt: Timestamp
+
+    + sendMessage(chatRoomId: number, userId: number, message: string, replyChatId: number)
+    + getMessages(chatRoomId: number)
+}
+
+
+
+
+
+
+@enduml

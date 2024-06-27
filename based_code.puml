@@ -1,0 +1,263 @@
+@startuml
+skinparam linetype polyline
+skinparam linetype ortho
+skinparam class {
+BackgroundColor White
+ArrowColor Black
+BorderColor Black
+}
+hide circle
+
+class PrismaService{
+}
+
+class AuthService{
+    - prisma: PrismaService
+    - jwtService: JwtService
+    - cache: VCacheService
+    - getTokens(userId: number, email:string): Token  
+    + login(email: string, password: string): UserData
+    + register(email: string, password: string, name): string
+    + refreshToken(userId: number): UserData
+    + changePassword(userId: number, oldPassword: string, newPassword: string): string
+    + editProfile(userId: number, name: string, email: string): string
+    + logout(userId: number): string
+    + deleteAccount(userId: number): string
+}
+
+class AuthController{
+    - authService: AuthService
+    + login(email: string, password: string): Response<UserData>
+    + register(email: string, password: string, name): Response<string>
+    + refreshToken(): Response<UserData>
+    + changePassword(oldPassword: string, newPassword: string): Response<string>
+    + editProfile(name: string, email: string): Response<string>
+    + logout(): Response<string>
+    + deleteAccount(): Response<string>
+}
+
+class ProjectService{
+    - prisma: PrismaService
+    - output: OutputService
+    + createProject(userId: number, param:CreateProjectDto): string
+    + findDetail(id: number, userId: number): ProjectDetailData
+    + findActiveProject(userId: number): ProjectData[]
+    + findSidebarProject(userId: number): SidebarProjectData[]
+    + findSidebarSubproject(userId: number, projectId: number): SidebarSubProjectData[]
+    + findSidebarFinding(userId: number, subprojectId: number): SidebarFindingData[]
+    + findProjectNotActiveList(userId: number): ProjectData[]
+    + findRecentUpdates(userId: number): RecentUpdateData[]
+    + searchNewMemberProject(email:stirng, projectId: number) : UserList[]
+    + searchMemberForNewProject(email: string, userId: number): UserList[]
+    + addMemberToProject(userId: number, projectId: number, adminId: number, role:ProjectRole): string
+    + removeMemberFromProject(userId: number, projectId: number, adminId: number): string
+    + editHeaderProject(userId: number, projectId: number, param: EditHeaderProjectDto): string
+    + editProfileProject(userId: number, projectId: number, file: FileData): string
+    + deleteProfileProject(userId: number, projectId: number): string
+    + uploadProjectFile(userId: number, projectId: number, file: FileData, param: UPFileParam): string
+    + removeProjectFile(userId: number, projectId: number, fileId: number, param: RPFileParam): string
+}
+
+class ProjectController{
+    - projectService: ProjectService
+    + createProject(param:CreateProjectDto): Response<string>
+    + findDetail(id: number): Response<ProjectDetailData>
+    + findActiveProject(): Response<ProjectData[]>
+    + findSidebarProject(): Response<SidebarProjectData[]>
+    + findSidebarSubproject( projectId: number): Response<SidebarSubProjectData[]>
+    + findSidebarFinding( subprojectId: number): Response<SidebarFindingData[]>
+    + findProjectNotActiveList(): Response<ProjectData[]>
+    + findRecentUpdates(): Response<RecentUpdateData[]>
+    + searchNewMemberProject(email:stirng, projectId: number) : Response<UserList[]>
+    + searchMemberForNewProject(email: string): Response<UserList[]>
+    + addMemberToProject( projectId: number, member:AddMemberDto): Response<string>
+    + removeMemberFromProject( projectId: number, param:RemoveMemberDto): Response<string>
+    + editHeaderProject( projectId: number, param: EditHeaderProjectDto): Response<string>
+    + editProfileProject( projectId: number, file: FileData): Response<string>
+    + deleteProfileProject( projectId: number): Response<string>
+    + uploadProjectReport( projectId: number, file: FileData): Response<string>
+    + removeProjectReport( projectId: number, fileId: number): Response<string>
+    + uploadProjectAttachment( projectId: number, file: FileData): Response<string>
+    + removeProjectAttachment( projectId: number, fileId: number): Response<string>
+}
+
+
+class SubProjectService{
+    - prisma: PrismaService
+    - output: OutputService
+    - editSubprojectMembers(param: EditSubprojectParam): string
+    + createSubproject(userId: number, projectId: number, param: CreateSubprojectDto): string
+    + findDetail(userId: number, subprojectId: number): SubprojectDetailData
+    + editHeaderSubproject(userId: number, subprojectId: number, param: EditHeaderSubprojectDto): string   
+    + uploadSubprojectFile(userId: number, subprojectId: number, file: FileData, param: USFileParam): string
+    + removeSubprojectFile(userId: number, subprojectId: number, fileId: number, param: RSFileParam): string
+    + deleteSubproject(userId: number, subprojectId: number): string
+    + promoteViewerToConsultant(userId: number, subprojectId: number, memberId: number): string  
+    + demoteConsultantToViewer(userId: number, subprojectId: number, memberId: number): string  
+}
+
+class SubProjectController{
+    - subProjectService: SubProjectService
+    + createSubproject(projectId: number, param: CreateSubprojectDto): Response<string>
+    + findDetail(subprojectId: number): Response<SubprojectDetailData>
+    + editHeaderSubproject(subprojectId: number, param: EditHeaderSubprojectDto): Response<string>
+    + deleteSubproject(subprojectId: number): Response<string>
+    + promoteViewerToConsultant(subprojectId: number, memberId: number): Response<string>
+    + demoteConsultantToViewer(subprojectId: number, memberId: number): Response<string>
+    + uploadSubprojectReport(subprojectId: number, file: FileData): Response<string>
+    + uploadSubprojectAttachment(subprojectId: number, file: FileData): Response<string>
+    + removeSubprojectReport(subprojectId: number, fileId: number): Response<string>
+    + removeSubprojectAttachment(subprojectId: number, fileId: number): Response<string>
+}
+
+
+class FindingService{
+    - prisma: PrismaService
+    - output: OutputService
+    - authorizedEditor(userId: number, subprojectId: number): void
+    - checkMemberFInding(userId: number, findingId: number): FindingWithUser
+    + createFinding(userId: number, subprojectId: number): string
+    + findDetail(userId: number, findingId: number): FindingDetailData
+    + editHeaderFinding(userId: number, findingId: number, param: EditHeaderFindingDto): string
+    + editFindingProperties(userId: number, findingId: number, param: EditFindingPropertyDto): string
+    + createRetestFinding(userId: number, findingId: number, param: CreateRetestFindingDto): string
+    + getRetestFindingList(userId: number, findingId: number): RetestFindingData[]
+    + getRetestFindingDetail(userId: number, findingId: number, retestId: number): RetestFindingDetailData
+    + editCVSSFinding(userId: number, findingId: number, param: EditCVSSFindingDto): string
+    + requestDeleteFinding(userId: number, findingId: number): string
+    + approveDeleteFindingRequest(userId: number, findingId: number): string
+    + rejectDeleteFindingRequest(userId: number, findingId: number): string
+    + getDocumentFindingList(findingId: number, type: string): DocumentFindingData[]
+    + saveFindingDocumentVersion(userId: number, findingId: number, param: DocumentVersionDto): string
+    + getFindingChatRoom(userId: number, findingId: number): ChatRoomData[]
+    + createFindingChatRoom(userId: number, findingId: number, param: CreateChatRoomDto): string
+    + searchFindingRoomChat(userId: number, findingId: number, query: string): ChatRoomData[]
+    + getChatRoomDetail(userId: number, findingId: number, roomId: number): ChatRoomDetailData
+    + sendChat(userId: number, findingId: number, roomId: number, param: SendChatDto): string
+    + uploadFindingFile(userId: number, findingId: number, file: FileData, param: UFFileParam): string
+    + deleteFinding(userId: number, findingId: number): string
+}
+
+
+class FindingController{
+    - findingService: FindingService
+    + createFinding(subprojectId: number): Response<string>
+    + findDetail(findingId: number): Response<FindingDetailData>
+    + editHeaderFinding(findingId: number, param: EditHeaderFindingDto): Response<string>
+    + editFindingProperties(findingId: number, param: EditFindingPropertyDto): Response<string>
+    + createRetestFinding(findingId: number, param: CreateRetestFindingDto): Response<string>
+    + getRetestFindingList(findingId: number): Response<RetestFindingData[]>
+    + getRetestFindingDetail(findingId: number, retestId: number): Response<RetestFindingDetailData>
+    + editCVSSFinding(findingId: number, param: EditCVSSFindingDto): Response<string>
+    + requestDeleteFinding(findingId: number): Response<string>
+    + approveDeleteFindingRequest(findingId: number): Response<string>
+    + rejectDeleteFindingRequest(findingId: number): Response<string>
+    + getDocumentFindingList(findingId: number, type: string): Response<DocumentFindingData[]>
+    + saveFindingDocumentVersion(findingId: number, param: DocumentVersionDto): Response<string>
+    + getFindingChatRoom(findingId: number): Response<ChatRoomData[]>
+    + createFindingChatRoom(findingId: number, param: CreateChatRoomDto): Response<string>
+    + searchFindingRoomChat(findingId: number, query: string): Response<ChatRoomData[]>
+    + getChatRoomDetail(findingId: number, roomId: number): Response<ChatRoomDetailData>
+    + sendChat(findingId: number, roomId: number, param: SendChatDto): Response<string>
+    + uploadFindingFile(findingId: number, file: FileData): Response<string>
+    + deleteFinding(findingId: number): Response<string>
+}
+
+
+class OutputService{
+    - emitter : EventEmitter
+    + projectLog(docId: number, data:ProjectLog): void
+    + projectSidebar(type: string, project: Project, users: number[]): void
+    + projectMember(type: string, projectId: number, param: ProjectMemberParam): void
+    + projectHeader(project: Project) : void
+    + projectFile(action: string, projectId: number, param: ProjectFileParam): void
+    + projectSubproject(type: string, subproject: Subproject) : void
+    + subprojectLog(docId: number, data:SubProjectLog): void
+    + subprojectSidebar(type: string, subproject: SubProject, users: number[]): void
+    + subprojectMember(type: string, subprojectId: number, param: SubProjectMemberParam): void
+    + subprojectHeader(subproject: SubProject) : void
+    + subprojectFile(action: string, subprojectId: number, param: SubProjectFileParam): void
+    + subprojectFinding(type: string, finding: Finding) : void
+    + subprojectDeleted( subprojectId: number) : void
+    + findingHeader(findingId: number, name: string) : void
+    + findingSidebar(type: string, finding: Finding, users: number[]) : void
+    + findingCVSS(findingId: number, data: Object) : void
+    + findingProp(findingId: number, data: FindingPropDto) : void
+    + findingRetest(findingId: number, data: RetestFinding) : void
+    + findingDeleted( findingId: number, status: string) : void
+    + roomChat(room: RoomChat) : void
+    + sendChat(roomId: number, chat: Chat) : void
+
+}
+
+class EventGateway{
+    + emitter: EventEmitter
+    + handleConnection(client: Socket): void
+    + handleDisconnect(client: Socket): void
+    + onProjectJoin(client: Socket, data: ProjectJoinDto): void
+    + onProjectLeave(client: Socket, data: ProjectLeaveDto): void
+    + handleProjectSubproject(payload: ProjectSubprojectPayload): void
+    + handleProjectReport(payload: ProjectReportPayload): void
+    + handleProjectAttachment(payload: ProjectAttachmentPayload): void
+    + handleProjectMember(payload: ProjectMemberPayload): void
+    + handleProjectHeader(payload: ProjectHeaderPayload): void
+    + handleProjectLog(payload: ProjectLogPayload): void
+    + handleProjectSidebar(paylaod: ProjectSidebarPayload): void
+    + handleSubProjectSidebar(paylaod: SubProjectSidebarPayload): void
+    + handleFindingSidebar(paylaod: FindingSidebarPayload): void
+    + handleSubprojectJoin(client: Socket, data: SubprojectJoinDto): void
+    + handleSubprojectLeave(client: Socket, data: SubprojectLeaveDto): void
+    + handleSubprojectHeader(payload: SubprojectHeaderPayload): void
+    + handleSubprojectMember(payload: SubprojectMemberPayload): void
+    + handleSubprojectLog(payload: SubprojectLogPayload): void
+    + handleSubprojectReport(payload: SubprojectReportPayload): void
+    + handleSubprojectAttachment(payload: SubprojectAttachmentPayload): void
+    + handleSubprojectFinding(payload: SubprojectFindingPayload): void
+    + handleFindingJoin(client: Socket, data: FindingJoinDto): void
+    + handleFindingLeave(client: Socket, data: FindingLeaveDto): void
+    + handleFindingHeader(payload: FindingHeaderPayload): void
+    + handleFindingProperty(payload: FindingPropertyPayload): void
+    + handleFindingCVSS(payload: FindingCVSSPayload): void
+    + handleFindingRetest(payload: FindingRetestPayload): void
+    + handleFindingDiscussion(payload: FindingDiscussionPayload): void
+    + handleSubprojectDeleted(payload: SubprojectDeletedPayload): void
+    + handleFindingDeleted(payload: FindingDeletedPayload): void
+    + handleRoomChatJoin(client: Socket, data: RoomChatJoinDto): void
+    + handleRoomChatLeave(client: Socket, data: RoomChatLeaveDto): void
+    + handleSendChat(payload: SendChatPayload): void
+
+
+    
+}
+
+class VCacheService{
+    - cacheManager: Cache
+    + setSessionUser(userId: number, sessionId: string): void
+    + verifySessionUser(userId: number, sessionId: string): boolean
+}
+
+class EventEmitter{
+    + emit(event: string, data: any): void
+}
+
+
+AuthService *-- AuthController
+ProjectService *-- ProjectController
+SubProjectService *-- SubProjectController
+FindingService *-- FindingController
+OutputService *-- ProjectService
+OutputService *-- SubProjectService
+OutputService *-- FindingService
+VCacheService *-- AuthService
+PrismaService *-- AuthService
+PrismaService *-- ProjectService
+PrismaService *-- SubProjectService
+PrismaService *-- FindingService
+EventEmitter *-- OutputService
+EventEmitter *-- EventGateway
+
+
+
+
+
+@enduml
